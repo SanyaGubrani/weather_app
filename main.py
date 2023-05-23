@@ -11,7 +11,6 @@ api_key = config.get('wgb', 'key')
 
 def current_weather(city):
     """Fetching the current weather of the city"""
-
     url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric'
     response = requests.get(url)
 
@@ -20,14 +19,16 @@ def current_weather(city):
         temp = data['main']['temp']
         humidity = data['main']['humidity']
         desc = data['weather'][0]['description']
+        wind_speed = data['wind']['speed']
+        pressure = data['main']['pressure']
 
         forecast_result.config(text='')
 
         current_weather_result.config(
-            text=f"Today's Weather in {city.upper()}:\n\nTemperature: {temp} °C\nHumidity: {humidity}%\nCondition: {desc}")
-   
+            text=f"\nToday's Weather in {city.upper()}:\n\nTemperature: {temp} °C\nHumidity: {humidity}%\nCondition: {desc}\nWind Speed: {wind_speed} m/s\nPressure: {pressure} hPa")
     else:
         current_weather_result.config(text='City not found.')
+
 
 
 def get_forecast(city):
@@ -73,8 +74,10 @@ def handle_forecast():
     city = city_entry.get().strip()
     if city:
         get_forecast(city)
+        forecast_result.pack() 
     else:
         forecast_result.config(text='Please enter a city.')
+
 
 
 
@@ -82,33 +85,37 @@ def handle_forecast():
 window = tk.Tk()
 window.title("Weather App")
 
-city_label = tk.Label(window, text="Enter the City: ", font=("Arial", 14))
-city_label.pack(pady=10)
+# Styling
+window.configure(bg='#f0f0f0')
+window.geometry('400x500')
 
-city_entry = tk.Entry(window, font=("Arial", 14))
-city_entry.pack()
+title_label = tk.Label(window, text="Weather App", font=("Arial", 20, "bold"), bg='#f0f0f0')
+title_label.pack(pady=10)
 
-buttons_frame = tk.Frame(window)
+input_frame = tk.Frame(window, bg='#f0f0f0')
+input_frame.pack(pady=10)
+
+city_label = tk.Label(input_frame, text="Enter the City: ", font=("Arial", 14), bg='#f0f0f0')
+city_label.pack(side='left')
+
+city_entry = tk.Entry(input_frame, font=("Arial", 14))
+city_entry.pack(side='left')
+
+buttons_frame = tk.Frame(window, bg='#f0f0f0')
 buttons_frame.pack(pady=10)
 
 current_weather_btn = tk.Button(buttons_frame, text="Current Weather", font=("Arial", 14),
-                               command=handle_current_weather)
+command=handle_current_weather)
+
 current_weather_btn.pack(side='left', padx=5)
 
-forecast_btn = tk.Button(buttons_frame, text="5-day Forecast", font=("Arial", 14),
-                         command=handle_forecast)
+forecast_btn = tk.Button(buttons_frame, text="5-day Forecast", font=("Arial", 14), command=handle_forecast)
 forecast_btn.pack(side='left', padx=5)
 
-current_weather_label = tk.Label(window, font=("Arial", 14, "bold"))
-current_weather_label.pack(pady=10)
-
-current_weather_result = tk.Label(window, font=("Arial", 14), justify='left')
+current_weather_result = tk.Label(window, font=("Arial", 14), justify='left', bg='#f0f0f0')
 current_weather_result.pack()
 
-forecast_label = tk.Label(window, font=("Arial", 14, "bold"))
-forecast_label.pack(pady=10)
+forecast_result = tk.Label(window, font=("Arial", 14), justify='left', bg='#f0f0f0')
 
-forecast_result = tk.Label(window, font=("Arial", 14), justify='left')
-forecast_result.pack()
 
 window.mainloop()
